@@ -1,0 +1,9 @@
+langchain
+python-dotenv
+streamlit
+langchain_experimental
+mysql-connector-python
+pymysql
+sentence-transformers
+chromadb
+langchain-community
