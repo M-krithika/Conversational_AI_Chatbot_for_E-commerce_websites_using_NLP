@@ -17,21 +17,36 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+
 def get_few_shot_db_chain():
     db_user = "root"
-    db_password = "root"
+    db_password = "srikar"
     db_host = "localhost"
     db_name = "project"
 
     db = SQLDatabase.from_uri(f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}",
                               sample_rows_in_table_info=3)
     # llm = GooglePalm(google_api_key=os.environ["GOOGLE_API_KEY"], temperature=0.1)
-    llm = GoogleGenerativeAI(model="gemini-pro", google_api_key=os.environ["GOOGLE_API_KEY"], temperature=0.2)
+    llm = GoogleGenerativeAI(model="gemini-2.5-pro-exp-03-25", google_api_key=os.environ["GOOGLE_API_KEY"], temperature=0.2)
 
     # embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
-    embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L12-v2')
+    embeddings = HuggingFaceEmbeddings(model_name='BAAI/bge-large-en')
     to_vectorize = [" ".join(example.values()) for example in few_shots]
-    vectorstore = Chroma.from_texts(to_vectorize, embeddings, metadatas=few_shots)
+    # vectorstore = Chroma.from_texts(to_vectorize, embeddings, metadatas=few_shots)
+    # persist_directory = "chroma_db"  # Directory to store the vector store
+    persist_directory = "chroma_db"  # Directory to store the vector store
+    try:
+        # Initialize Chroma with persistence and explicit tenant configuration
+        vectorstore = Chroma(
+            collection_name="few_shots",
+            embedding_function=embeddings,
+            persist_directory=persist_directory
+        )
+        # Add the texts to the vector store (this will create the collection if it doesn't exist)
+        vectorstore.add_texts(texts=to_vectorize, metadatas=few_shots)
+        vectorstore.persist()
+    except Exception as e:
+        raise e
     example_selector = SemanticSimilarityExampleSelector(
         vectorstore=vectorstore,
         k=2,
@@ -42,6 +57,28 @@ def get_few_shot_db_chain():
     Never query for all columns from a table. You must query only the columns that are needed to answer the question. Wrap each column name in backticks (`) to denote them as delimited identifiers.
     Pay attention to use only the column names you can see in the tables below. Be careful to not query for columns that do not exist. Also, pay attention to which column is in which table.
     Pay attention to use CURDATE() function to get the current date, if the question involves "today".
+     
+     Note:
+    - Always format the response in a customer-friendly manner
+    - Use natural language that sounds like a helpful customer service representative
+    - Refer to the the Few Shots example
+    - Generate syntactically Correct SQL Query
+    - CRITICAL: ONLY generate the pure SQL query text
+    - DO NOT INCLUDE THE WORD 'sql' BEFORE OR WITHIN THE SQL QUERY
+    - DONT GIVE RAW SQL QUERY AS RESPONSE TO USER. GENERATE RESPONSE IN NATURAL LANGUAGE
+    
+    RESPONSE GENERATION CRITICAL INSTRUCTIONS:
+    1. AFTER obtaining the SQL query result, ALWAYS TRANSFORM THE RAW DATA INTO A WARM, HELPFULL CUSTOMER SERVICE RESPONSE
+    2. If no order is found:
+        - Provide a sympathetic message
+        - Suggest contacting customer support
+        - Offer alternative assistance
+    3. If order is found:
+        - Clearly state the current order status
+        - Include relevant details like estimated delivery date
+        - Use a friendly, reassuring tone
+    4. NEVER RETURN THE SQL QUERY TO THE USER
+    5. Speak as a helpful customer service representative would
 
      For order status queries:
     - If an order is not found, inform the customer politely and suggest contacting customer support
