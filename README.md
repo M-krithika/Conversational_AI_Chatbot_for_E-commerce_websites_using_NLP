@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/52af3003-38b5-460a-bcb6-31e98afe8ccd)# AI-Based-Customer-Support-Chatbot
+# AI-Based-Customer-Support-Chatbot
 
 
 A **customer support chatbot** for an e-commerce electronics store, built using **Streamlit**, **LangChain**, and **MySQL**. This AI-powered chatbot assists users in browsing products (e.g., mobiles, laptops), checking prices, updating user details, and more, by generating SQL queries and providing natural language responses in a customer-friendly manner.
