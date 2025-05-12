@@ -30,6 +30,13 @@ This project is an **AI-based customer support chatbot** designed for an e-comme
 - **Vector Store**: Chroma (for few-shot example selection)
 
 
+## Output Screens
+
+![image](https://github.com/user-attachments/assets/4740d086-8940-4d98-bde8-b85b2759f374)
+
+
+Login Page
+
 
 ## 📋 Prerequisites
 
