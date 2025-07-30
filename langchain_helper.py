@@ -20,7 +20,7 @@ load_dotenv()
 
 def get_few_shot_db_chain():
     db_user = "root"
-    db_password = "srikar"
+    db_password = "Database@123"
     db_host = "localhost"
     db_name = "project"
 
